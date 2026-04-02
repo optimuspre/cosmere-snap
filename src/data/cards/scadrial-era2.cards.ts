@@ -1,0 +1,43 @@
+import type { CardDefinition } from '../../types';
+
+export const scadrialEra2Cards: CardDefinition[] = [
+  {
+    id: 'wax',
+    name: 'Waxillium Ladrian',
+    world: 'scadrial-era2',
+    cost: 3,
+    basePower: 4,
+    abilityTrigger: 'on_reveal',
+    abilityText: 'On Reveal: Move yourself to any other location.',
+    abilityKey: 'wax_on_reveal',
+    tags: ['allomancer'],
+    artKey: 'wax',
+    flavorText: 'Lawman of the Roughs.',
+  },
+  {
+    id: 'wayne',
+    name: 'Wayne',
+    world: 'scadrial-era2',
+    cost: 2,
+    basePower: 2,
+    abilityTrigger: 'ongoing',
+    abilityText: 'Ongoing: Gains +1 Power each time another card is played at this location.',
+    abilityKey: 'wayne_ongoing',
+    tags: ['feruchemist'],
+    artKey: 'wayne',
+    flavorText: 'Hats are the soul of a man.',
+  },
+  {
+    id: 'marasi',
+    name: 'Marasi Colms',
+    world: 'scadrial-era2',
+    cost: 2,
+    basePower: 2,
+    abilityTrigger: 'on_reveal',
+    abilityText: 'On Reveal: Trap this location. The next enemy card played here loses 2 Power.',
+    abilityKey: 'marasi_on_reveal',
+    tags: [],
+    artKey: 'marasi',
+    flavorText: 'Constable of Elendel.',
+  },
+];

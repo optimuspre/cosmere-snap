@@ -1,0 +1,43 @@
+import type { CardDefinition } from '../../types';
+
+export const selCards: CardDefinition[] = [
+  {
+    id: 'raoden',
+    name: 'Raoden',
+    world: 'sel',
+    cost: 4,
+    basePower: 5,
+    abilityTrigger: 'on_reveal',
+    abilityText: 'On Reveal: Remove all negative Power effects from friendly cards here.',
+    abilityKey: 'raoden_on_reveal',
+    tags: [],
+    artKey: 'raoden',
+    flavorText: 'Spirit of Elantris.',
+  },
+  {
+    id: 'sarene',
+    name: 'Sarene',
+    world: 'sel',
+    cost: 3,
+    basePower: 4,
+    abilityTrigger: 'on_reveal',
+    abilityText: 'On Reveal: Reveal one random card from the opponent\'s hand.',
+    abilityKey: 'sarene_on_reveal',
+    tags: [],
+    artKey: 'sarene',
+    flavorText: 'She outmaneuvered everyone in the room.',
+  },
+  {
+    id: 'galladon',
+    name: 'Galladon',
+    world: 'sel',
+    cost: 2,
+    basePower: 3,
+    abilityTrigger: 'on_reveal',
+    abilityText: 'On Reveal: If Raoden is at this location, gain +2 Power.',
+    abilityKey: 'galladon_on_reveal',
+    tags: [],
+    artKey: 'galladon',
+    flavorText: 'Kaloo kalay, my friend. Kolo?',
+  },
+];
