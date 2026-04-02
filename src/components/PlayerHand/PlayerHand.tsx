@@ -4,29 +4,46 @@ import { CardComponent } from '../Card/CardComponent';
 interface Props {
   cards: CardInstance[];
   pendingPlayIds: string[];
+  selectedHandCardId: string | null;
   draggingCardId: string | null;
   onDragStart: (cardId: string) => void;
   onDragEnd: () => void;
-  onCardClick: (cardId: string) => void;
+  onCardTap: (cardId: string) => void;
+  onCardDetailClick: (card: CardInstance) => void;
 }
 
-export function PlayerHand({ cards, pendingPlayIds, draggingCardId, onDragStart, onDragEnd, onCardClick }: Props) {
+export function PlayerHand({
+  cards,
+  pendingPlayIds,
+  selectedHandCardId,
+  draggingCardId: _draggingCardId,
+  onDragStart,
+  onDragEnd,
+  onCardTap,
+  onCardDetailClick,
+}: Props) {
   return (
-    <div className="flex gap-2 items-end justify-center flex-wrap">
+    <div className="flex gap-1.5 items-end justify-center flex-wrap">
       {cards.map((card) => {
         const isPending = pendingPlayIds.includes(card.instanceId);
+        const isSelected = selectedHandCardId === card.instanceId;
         return (
           <div
             key={card.instanceId}
-            style={{ opacity: isPending ? 0.5 : 1, transition: 'opacity 0.2s' }}
+            style={{
+              opacity: isPending ? 0.45 : 1,
+              transition: 'opacity 0.2s, transform 0.15s',
+              transform: isSelected ? 'translateY(-8px)' : 'none',
+            }}
           >
             <CardComponent
               card={card}
               isPending={isPending}
-              isSelected={draggingCardId === card.instanceId}
+              isSelected={isSelected}
               onDragStart={() => onDragStart(card.instanceId)}
               onDragEnd={onDragEnd}
-              onClick={() => onCardClick(card.instanceId)}
+              onClick={() => onCardTap(card.instanceId)}
+              onDetailClick={() => onCardDetailClick(card)}
             />
           </div>
         );

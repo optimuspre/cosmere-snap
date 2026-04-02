@@ -1,4 +1,4 @@
-import type { LocationState } from '../../types';
+import type { LocationState, CardInstance } from '../../types';
 import { LOCATION_REGISTRY } from '../../data/locations';
 import { CardComponent } from '../Card/CardComponent';
 import { CardBack } from '../Card/CardBack';
@@ -7,20 +7,24 @@ interface Props {
   locationState: LocationState;
   locationIndex: number;
   isDropTarget: boolean;
+  selectedHandCardId: string | null;
   onDrop: (locationIndex: number) => void;
   onDragOver: (e: React.DragEvent) => void;
   onDragLeave: () => void;
-  onCardClick?: (cardInstanceId: string) => void;
+  onTap: (locationIndex: number) => void;
+  onBoardCardClick: (card: CardInstance) => void;
 }
 
 export function LocationSlot({
   locationState,
   locationIndex,
   isDropTarget,
+  selectedHandCardId,
   onDrop,
   onDragOver,
   onDragLeave,
-  onCardClick,
+  onTap,
+  onBoardCardClick,
 }: Props) {
   const locDef = LOCATION_REGISTRY.get(locationState.definitionId);
 
@@ -31,41 +35,49 @@ export function LocationSlot({
       ? 'winner-glow-ai'
       : '';
 
+  const isTapTarget = !!selectedHandCardId && locationState.isRevealed;
+
   return (
     <div
-      className={`location-slot flex flex-col ${isDropTarget ? 'drop-target' : ''} ${winnerClass} ${locationState.isRevealed ? 'location-reveal' : ''}`}
-      style={{ flex: 1, minWidth: 0 }}
+      className={`location-slot flex flex-col ${isDropTarget || isTapTarget ? 'drop-target' : ''} ${winnerClass} ${locationState.isRevealed ? 'location-reveal' : ''}`}
+      style={{ flex: 1, minWidth: 0, cursor: isTapTarget ? 'pointer' : 'default' }}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={() => onDrop(locationIndex)}
+      onClick={() => isTapTarget && onTap(locationIndex)}
     >
       {/* Location header */}
       <div
-        className="text-center p-2 border-b"
-        style={{ borderColor: 'var(--border)', minHeight: 72 }}
+        className="text-center px-1 py-1 border-b"
+        style={{ borderColor: 'var(--border)', minHeight: 56 }}
       >
         {locationState.isRevealed && locDef ? (
           <>
-            <div className="font-bold text-sm text-white leading-tight">{locDef.name}</div>
-            <div className="text-xs text-gray-400 mt-0.5 leading-tight">{locDef.effectText}</div>
+            <div className="font-bold text-xs text-white leading-tight">{locDef.name}</div>
+            <div className="text-gray-400 mt-0.5 leading-tight" style={{ fontSize: '0.58rem' }}>{locDef.effectText}</div>
           </>
         ) : (
-          <div className="text-gray-600 text-xs mt-2">Unrevealed</div>
+          <div className="text-gray-600 text-xs mt-2">?</div>
         )}
       </div>
 
       {/* Power totals */}
-      <div className="flex justify-between px-3 py-1 text-sm font-bold">
+      <div className="flex justify-between px-2 py-0.5 text-xs font-bold">
         <span className="text-blue-400">{locationState.powerTotals.player}</span>
-        <span className="text-gray-500 text-xs">vs</span>
+        <span className="text-gray-600">·</span>
         <span className="text-red-400">{locationState.powerTotals.ai}</span>
       </div>
 
       {/* AI cards (top) */}
-      <div className="flex flex-wrap gap-1 justify-center p-1" style={{ minHeight: 60 }}>
+      <div className="flex flex-wrap gap-0.5 justify-center p-1" style={{ minHeight: 48 }}>
         {locationState.cards.ai.map((card) =>
           card.isRevealed ? (
-            <CardComponent key={card.instanceId} card={card} size="sm" />
+            <CardComponent
+              key={card.instanceId}
+              card={card}
+              size="sm"
+              onClick={() => onBoardCardClick(card)}
+            />
           ) : (
             <CardBack key={card.instanceId} size="sm" />
           )
@@ -73,12 +85,12 @@ export function LocationSlot({
       </div>
 
       {/* Divider */}
-      <div style={{ height: 1, background: 'var(--border)', margin: '0 8px' }} />
+      <div style={{ height: 1, background: 'var(--border)', margin: '0 6px' }} />
 
       {/* Player cards (bottom) */}
       <div
-        className="flex flex-wrap gap-1 justify-center p-1"
-        style={{ minHeight: 60, flex: 1 }}
+        className="flex flex-wrap gap-0.5 justify-center p-1"
+        style={{ minHeight: 48, flex: 1 }}
         onDrop={() => onDrop(locationIndex)}
       >
         {locationState.cards.player.map((card) => (
@@ -86,7 +98,7 @@ export function LocationSlot({
             key={card.instanceId}
             card={card}
             size="sm"
-            onClick={() => onCardClick?.(card.instanceId)}
+            onClick={() => onBoardCardClick(card)}
           />
         ))}
       </div>

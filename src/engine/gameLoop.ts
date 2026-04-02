@@ -11,6 +11,8 @@ import { applyPatches } from './patchApplier';
 import { applyRevealEffects, applyBraizeEffect, applyWellOfAscensionEffect } from './locationEffects';
 import { computeLocationWinners, computeGameWinner } from './winCondition';
 import { pickNRandom } from '../utils/random';
+import { CARD_REGISTRY } from '../data/cards';
+import { LOCATION_REGISTRY } from '../data/locations';
 import '../engine/abilities/index'; // register all abilities
 
 function createInitialPlayerState(id: 'player' | 'ai'): PlayerState {
@@ -87,23 +89,67 @@ export function revealTurn(state: GameState): GameState {
   let s = state;
 
   // Apply reveal effects for newly-revealed locations
+  const revealLogPatches: GameStatePatch[] = [];
   for (let i = 0; i < 3; i++) {
     if (s.locations[i].isRevealed && s.locations[i].revealedOnTurn === s.turn) {
       s = applyRevealEffects(s, i);
+      const locDef = LOCATION_REGISTRY.get(s.locations[i].definitionId);
+      if (locDef) {
+        revealLogPatches.push({
+          type: 'log_event',
+          event: { turn: s.turn, type: 'location_revealed', message: `📍 ${locDef.name} revealed — ${locDef.effectText}` },
+        });
+      }
     }
   }
+  s = applyPatches(s, revealLogPatches);
 
   // Place pending plays
   s = commitPendingPlays(s, 'player');
   s = commitPendingPlays(s, 'ai');
 
-  // Fire On Reveal abilities
+  // Log card plays
+  const playLogPatches: GameStatePatch[] = [];
+  for (const pid of ['player', 'ai'] as const) {
+    for (let locIdx = 0; locIdx < 3; locIdx++) {
+      for (const card of s.locations[locIdx].cards[pid]) {
+        if (card.isRevealed && card.turnsOnBoard === 0) {
+          const def = CARD_REGISTRY.get(card.definitionId);
+          if (def) {
+            playLogPatches.push({
+              type: 'log_event',
+              event: {
+                turn: s.turn,
+                type: 'card_played',
+                message: `${pid === 'player' ? '🟦 You' : '🟥 AI'} played ${def.name} (${card.currentPower}⚡) at Loc ${locIdx + 1}`,
+              },
+            });
+          }
+        }
+      }
+    }
+  }
+  s = applyPatches(s, playLogPatches);
+
+  // Fire On Reveal abilities and log them
   const onRevealPatches: GameStatePatch[] = [];
   for (const pid of ['player', 'ai'] as const) {
     for (let locIdx = 0; locIdx < 3; locIdx++) {
       for (const card of s.locations[locIdx].cards[pid]) {
         if (card.isRevealed && card.turnsOnBoard === 0) {
-          onRevealPatches.push(...resolveOnReveal(card, locIdx, s));
+          const def = CARD_REGISTRY.get(card.definitionId);
+          const abilityPatches = resolveOnReveal(card, locIdx, s);
+          if (abilityPatches.length > 0 && def?.abilityTrigger === 'on_reveal') {
+            onRevealPatches.push({
+              type: 'log_event',
+              event: {
+                turn: s.turn,
+                type: 'ability_triggered',
+                message: `✨ ${def.name}: ${def.abilityText.replace('On Reveal: ', '')}`,
+              },
+            });
+          }
+          onRevealPatches.push(...abilityPatches);
         }
       }
     }
