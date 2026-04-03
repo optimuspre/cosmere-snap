@@ -7,13 +7,14 @@ import { EnergyBar } from '../EnergyBar/EnergyBar';
 import { GameLog } from '../GameLog/GameLog';
 import { GameOverModal } from '../GameOver/GameOverModal';
 import { CardDetailModal } from '../Card/CardDetailModal';
+import { CardComponent } from '../Card/CardComponent';
 import { CardBack } from '../Card/CardBack';
 import type { CardInstance } from '../../types';
 
 export function GameBoard() {
   useAITurn();
 
-  const { gameState, playCard, removePlay, endPlayerTurn, resetGame } = useGameStore();
+  const { gameState, playCard, removePlay, endPlayerTurn, resetGame, resolveCardTarget } = useGameStore();
 
   const [draggingCardId, setDraggingCardId] = useState<string | null>(null);
   const [hoveredLocationIndex, setHoveredLocationIndex] = useState<number | null>(null);
@@ -201,6 +202,40 @@ export function GameBoard() {
       {detailCard && (
         <CardDetailModal card={detailCard} onClose={() => setDetailCard(null)} />
       )}
+
+      {/* ── Cultivation card-target picker ── */}
+      {gameState.pendingTargetSelection?.type === 'card' && gameState.pendingTargetSelection.playerId === 'player' && (() => {
+        const allPlayerCards = gameState.locations.flatMap((loc) =>
+          loc.cards.player.filter((c) => !c.isDestroyed && c.instanceId !== gameState.pendingTargetSelection!.cardInstanceId)
+        );
+        return (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{ background: 'rgba(0,0,0,0.75)' }}
+          >
+            <div
+              className="rounded-xl p-4 flex flex-col gap-3"
+              style={{ background: '#1a1a2e', border: '1px solid var(--border)', maxWidth: 320, width: '90%' }}
+            >
+              <div className="text-center">
+                <div className="text-white font-bold text-sm mb-1">Cultivation</div>
+                <div className="text-gray-400 text-xs">Choose a friendly card to permanently gain +3 Power</div>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {allPlayerCards.map((card) => (
+                  <div
+                    key={card.instanceId}
+                    onClick={() => resolveCardTarget(card.instanceId)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <CardComponent card={card} size="md" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ── Game over ── */}
       {gameState.phase === 'game_over' && (

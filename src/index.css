@@ -51,6 +51,15 @@ body {
   border-style: dashed;
 }
 
+.card .power-badge {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.card:hover .power-badge,
+.card.selected .power-badge {
+  opacity: 1;
+}
+
 .location-slot {
   background: rgba(255,255,255,0.03);
   border: 1px solid var(--border);

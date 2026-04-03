@@ -16,7 +16,9 @@ export type AbilityTag =
   | 'awakener'
   | 'spren'
   | 'worldhopper'
-  | 'bridge_four';
+  | 'bridge_four'
+  | 'lightweaver'
+  | 'listener';
 
 export interface CardDefinition {
   id: string;

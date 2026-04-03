@@ -123,3 +123,26 @@ registerAbility('marasi_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
   const weakest = enemies.reduce((min, c) => (c.currentPower < min.currentPower ? c : min));
   return [{ type: 'modify_power', targetInstanceId: weakest.instanceId, amount: -2, isPermanent: false }];
 });
+
+registerAbility('breeze_ongoing', (ctx: AbilityContext): GameStatePatch[] => {
+  const enemyId = ctx.triggeringCard.ownerId === 'player' ? 'ai' : 'player';
+  const loc = ctx.gameState.locations[ctx.locationIndex];
+  const enemies = loc.cards[enemyId].filter((c) => !c.isDestroyed);
+  if (enemies.length === 0) return [];
+  const strongest = enemies.reduce((max, c) => (c.currentPower > max.currentPower ? c : max));
+  return [{ type: 'modify_power', targetInstanceId: strongest.instanceId, amount: -2, isPermanent: false }];
+});
+
+registerAbility('ham_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
+  const loc = ctx.gameState.locations[ctx.locationIndex];
+  const allOthers = [
+    ...loc.cards['player'].filter((c) => c.instanceId !== ctx.triggeringCard.instanceId && !c.isDestroyed),
+    ...loc.cards['ai'].filter((c) => !c.isDestroyed),
+  ];
+  if (allOthers.length === 0) return [];
+  return [{ type: 'modify_power', targetInstanceId: ctx.triggeringCard.instanceId, amount: allOthers.length, isPermanent: false }];
+});
+
+registerAbility('steris_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
+  return [{ type: 'draw_card', playerId: ctx.triggeringCard.ownerId, count: 1 }];
+});

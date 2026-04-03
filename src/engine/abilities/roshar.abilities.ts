@@ -2,6 +2,15 @@ import { registerAbility } from '../abilityResolver';
 import type { AbilityContext, GameStatePatch } from '../../types/ability.types';
 import { CARD_REGISTRY } from '../../data/cards';
 
+registerAbility('adolin_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
+  const opponentId = ctx.triggeringCard.ownerId === 'player' ? 'ai' : 'player';
+  const loc = ctx.gameState.locations[ctx.locationIndex];
+  const enemies = loc.cards[opponentId].filter((c) => !c.isDestroyed);
+  if (enemies.length === 0) return [];
+  const weakest = enemies.reduce((min, c) => (c.currentPower < min.currentPower ? c : min));
+  return [{ type: 'destroy_card', targetInstanceId: weakest.instanceId }];
+});
+
 registerAbility('kaladin_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
   const loc = ctx.gameState.locations[ctx.locationIndex];
   return loc.cards[ctx.triggeringCard.ownerId]
@@ -90,6 +99,32 @@ registerAbility('renarin_ongoing', (ctx: AbilityContext): GameStatePatch[] => {
   const turns = ctx.triggeringCard.turnsOnBoard;
   if (turns <= 0) return [];
   return [{ type: 'modify_power', targetInstanceId: ctx.triggeringCard.instanceId, amount: turns, isPermanent: false }];
+});
+
+registerAbility('shallan_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
+  return [{ type: 'draw_card', playerId: ctx.triggeringCard.ownerId, count: 2 }];
+});
+
+registerAbility('pattern_ongoing', (ctx: AbilityContext): GameStatePatch[] => {
+  const ownerId = ctx.triggeringCard.ownerId;
+  for (const loc of ctx.gameState.locations) {
+    const shallan = loc.cards[ownerId].find((c) => c.definitionId === 'shallan_davar' && !c.isDestroyed);
+    if (shallan) {
+      return [{ type: 'modify_power', targetInstanceId: shallan.instanceId, amount: 3, isPermanent: false }];
+    }
+  }
+  return [];
+});
+
+registerAbility('eshonai_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
+  const enemyId = ctx.triggeringCard.ownerId === 'player' ? 'ai' : 'player';
+  const loc = ctx.gameState.locations[ctx.locationIndex];
+  const myPower = loc.powerTotals[ctx.triggeringCard.ownerId];
+  const enemyPower = loc.powerTotals[enemyId];
+  if (enemyPower > myPower) {
+    return [{ type: 'modify_power', targetInstanceId: ctx.triggeringCard.instanceId, amount: 4, isPermanent: false }];
+  }
+  return [];
 });
 
 registerAbility('bridge_four_soldier_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {

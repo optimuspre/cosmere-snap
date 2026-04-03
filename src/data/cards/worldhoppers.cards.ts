@@ -66,4 +66,17 @@ export const worldhopperCards: CardDefinition[] = [
     artKey: 'cultivation',
     flavorText: 'She plans centuries ahead.',
   },
+  {
+    id: 'harmony',
+    name: 'Harmony (Sazed)',
+    world: 'cosmere-wide',
+    cost: 6,
+    basePower: 7,
+    abilityTrigger: 'ongoing',
+    abilityText: 'Ongoing: All your cards on the board gain +1 Power.',
+    abilityKey: 'harmony_ongoing',
+    tags: [],
+    artKey: 'harmony',
+    flavorText: 'He held two opposing forces and found balance between them.',
+  },
 ];

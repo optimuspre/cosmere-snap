@@ -22,6 +22,7 @@ export type GameStatePatch =
   | { type: 'set_immune'; targetInstanceId: string }
   | { type: 'set_energy_discount'; playerId: PlayerId; value: boolean }
   | { type: 'set_last_played'; locationIndex: number; playerId: PlayerId }
-  | { type: 'log_event'; event: Omit<GameEvent, 'id'> };
+  | { type: 'log_event'; event: Omit<GameEvent, 'id'> }
+  | { type: 'request_card_target'; abilityKey: string; triggeringCardInstanceId: string; playerId: PlayerId };
 
 export type AbilityResolver = (ctx: AbilityContext) => GameStatePatch[];

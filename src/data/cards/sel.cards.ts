@@ -40,4 +40,17 @@ export const selCards: CardDefinition[] = [
     artKey: 'galladon',
     flavorText: 'Kaloo kalay, my friend. Kolo?',
   },
+  {
+    id: 'hrathen',
+    name: 'Hrathen',
+    world: 'sel',
+    cost: 4,
+    basePower: 5,
+    abilityTrigger: 'ongoing',
+    abilityText: 'Ongoing: Enemy cards at this location have -1 Power.',
+    abilityKey: 'hrathen_ongoing',
+    tags: [],
+    artKey: 'hrathen',
+    flavorText: 'He came to save Arelon. He wasn\'t sure he succeeded.',
+  },
 ];

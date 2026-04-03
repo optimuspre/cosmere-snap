@@ -124,6 +124,15 @@ export function applyPatches(state: GameState, patches: GameStatePatch[]): GameS
           draft.eventLog.push({ ...patch.event, id: generateId('evt') });
           break;
         }
+        case 'request_card_target': {
+          draft.pendingTargetSelection = {
+            cardInstanceId: patch.triggeringCardInstanceId,
+            type: 'card',
+            playerId: patch.playerId,
+            abilityKey: patch.abilityKey,
+          };
+          break;
+        }
       }
     }
   });

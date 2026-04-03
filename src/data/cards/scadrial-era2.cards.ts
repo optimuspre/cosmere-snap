@@ -40,4 +40,17 @@ export const scadrialEra2Cards: CardDefinition[] = [
     artKey: 'marasi',
     flavorText: 'Constable of Elendel.',
   },
+  {
+    id: 'steris',
+    name: 'Steris Harms',
+    world: 'scadrial-era2',
+    cost: 1,
+    basePower: 1,
+    abilityTrigger: 'on_reveal',
+    abilityText: 'On Reveal: Draw 1 card.',
+    abilityKey: 'steris_on_reveal',
+    tags: [],
+    artKey: 'steris',
+    flavorText: 'She had a contingency plan for every contingency plan.',
+  },
 ];

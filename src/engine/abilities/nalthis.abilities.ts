@@ -1,6 +1,7 @@
 import { registerAbility } from '../abilityResolver';
 import type { AbilityContext, GameStatePatch } from '../../types/ability.types';
 import { pickRandom } from '../../utils/random';
+import { CARD_REGISTRY } from '../../data/cards';
 
 registerAbility('vasher_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
   const loc = ctx.gameState.locations[ctx.locationIndex];
@@ -77,4 +78,31 @@ registerAbility('nightblood_end_of_turn', (ctx: AbilityContext): GameStatePatch[
   }
 
   return patches;
+});
+registerAbility('siri_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
+  const ownerId = ctx.triggeringCard.ownerId;
+  const patches: GameStatePatch[] = [];
+  for (const loc of ctx.gameState.locations) {
+    for (const card of loc.cards[ownerId]) {
+      if (!card.isDestroyed && card.instanceId !== ctx.triggeringCard.instanceId) {
+        const def = CARD_REGISTRY.get(card.definitionId);
+        if (def?.world === 'nalthis') {
+          patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: 1, isPermanent: false });
+        }
+      }
+    }
+  }
+  return patches;
+});
+
+registerAbility('denth_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
+  const enemyId = ctx.triggeringCard.ownerId === 'player' ? 'ai' : 'player';
+  const loc = ctx.gameState.locations[ctx.locationIndex];
+  const enemies = loc.cards[enemyId].filter((c) => !c.isDestroyed && !c.isImmune);
+  if (enemies.length === 0) return [];
+  const weakest = enemies.reduce((min, c) => (c.currentPower < min.currentPower ? c : min));
+  return [
+    { type: 'destroy_card', targetInstanceId: weakest.instanceId },
+    { type: 'modify_power', targetInstanceId: ctx.triggeringCard.instanceId, amount: -2, isPermanent: true },
+  ];
 });

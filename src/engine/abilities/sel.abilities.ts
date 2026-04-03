@@ -41,3 +41,10 @@ registerAbility('galladon_on_reveal', (ctx: AbilityContext): GameStatePatch[] =>
   if (!hasRaoden) return [];
   return [{ type: 'modify_power', targetInstanceId: ctx.triggeringCard.instanceId, amount: 2, isPermanent: false }];
 });
+registerAbility('hrathen_ongoing', (ctx: AbilityContext): GameStatePatch[] => {
+  const enemyId = ctx.triggeringCard.ownerId === 'player' ? 'ai' : 'player';
+  const loc = ctx.gameState.locations[ctx.locationIndex];
+  return loc.cards[enemyId]
+    .filter((c) => !c.isDestroyed)
+    .map((c) => ({ type: 'modify_power' as const, targetInstanceId: c.instanceId, amount: -1, isPermanent: false }));
+});
