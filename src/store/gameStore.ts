@@ -1,15 +1,20 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import type { GameState } from '../types/game.types';
+import type { World } from '../types/card.types';
 import { getInitializedGame, revealTurn, endTurn } from '../engine/gameLoop';
 import { addPendingPlay, removePendingPlay } from '../engine/cardPlacement';
 import { applyPatches } from '../engine/patchApplier';
 import { runAiTurn } from '../engine/ai/aiPlayer';
 
+const ALL_WORLDS: World[] = ['roshar', 'scadrial-era1', 'scadrial-era2', 'nalthis', 'sel', 'cosmere-wide'];
+
 interface GameStore {
   gameState: GameState;
+  gameStarted: boolean;
+  selectedWorlds: World[];
   revealedOpponentHand: boolean;
-  initGame: () => void;
+  startGame: (worlds: World[]) => void;
   playCard: (cardInstanceId: string, locationIndex: number) => void;
   removePlay: (cardInstanceId: string) => void;
   endPlayerTurn: () => void;
@@ -21,11 +26,15 @@ interface GameStore {
 export const useGameStore = create<GameStore>()(
   immer((set) => ({
     gameState: getInitializedGame(),
+    gameStarted: false,
+    selectedWorlds: ALL_WORLDS,
     revealedOpponentHand: false,
 
-    initGame: () => {
+    startGame: (worlds) => {
       set((draft) => {
-        draft.gameState = getInitializedGame();
+        draft.selectedWorlds = worlds;
+        draft.gameState = getInitializedGame(worlds);
+        draft.gameStarted = true;
         draft.revealedOpponentHand = false;
       });
     },
@@ -89,7 +98,7 @@ export const useGameStore = create<GameStore>()(
 
     resetGame: () => {
       set((draft) => {
-        draft.gameState = getInitializedGame();
+        draft.gameState = getInitializedGame(draft.selectedWorlds);
         draft.revealedOpponentHand = false;
       });
     },

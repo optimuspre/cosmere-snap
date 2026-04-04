@@ -1,5 +1,6 @@
 import { produce } from 'immer';
 import type { GameState, PlayerState } from '../types/game.types';
+import type { World } from '../types/card.types';
 import type { GameStatePatch } from '../types/ability.types';
 import { ALL_LOCATIONS } from '../data/locations';
 import { STARTING_HAND, TOTAL_TURNS, MAX_ENERGY } from '../data/constants';
@@ -15,8 +16,8 @@ import { CARD_REGISTRY } from '../data/cards';
 import { LOCATION_REGISTRY } from '../data/locations';
 import '../engine/abilities/index'; // register all abilities
 
-function createInitialPlayerState(id: 'player' | 'ai'): PlayerState {
-  const deck = buildDeck(id);
+function createInitialPlayerState(id: 'player' | 'ai', allowedWorlds?: World[]): PlayerState {
+  const deck = buildDeck(id, allowedWorlds);
   const hand = deck.splice(0, STARTING_HAND);
   return {
     id,
@@ -29,7 +30,7 @@ function createInitialPlayerState(id: 'player' | 'ai'): PlayerState {
   };
 }
 
-export function initGame(): GameState {
+export function initGame(allowedWorlds?: World[]): GameState {
   const selectedLocDefs = pickNRandom(ALL_LOCATIONS, 3);
 
   const locations = selectedLocDefs.map((def) => ({
@@ -49,8 +50,8 @@ export function initGame(): GameState {
     turn: 1,
     locations,
     players: {
-      player: createInitialPlayerState('player'),
-      ai: createInitialPlayerState('ai'),
+      player: createInitialPlayerState('player', allowedWorlds),
+      ai: createInitialPlayerState('ai', allowedWorlds),
     },
     eventLog: [],
     winner: null,
@@ -195,7 +196,7 @@ export function endTurn(state: GameState): GameState {
   return startTurn(s);
 }
 
-export function getInitializedGame(): GameState {
-  const state = initGame();
+export function getInitializedGame(allowedWorlds?: World[]): GameState {
+  const state = initGame(allowedWorlds);
   return startTurn(state);
 }
