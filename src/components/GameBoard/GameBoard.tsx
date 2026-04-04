@@ -16,6 +16,11 @@ export function GameBoard() {
   useAITurn();
 
   const { gameState, playCard, removePlay, endPlayerTurn, resetGame, resolveCardTarget } = useGameStore();
+
+  function handlePlayAgain() {
+    setShowBoardPreview(false);
+    resetGame();
+  }
   const isMobile = useIsMobile();
 
   const [draggingCardId, setDraggingCardId] = useState<string | null>(null);
@@ -23,6 +28,7 @@ export function GameBoard() {
   const [selectedHandCardId, setSelectedHandCardId] = useState<string | null>(null);
   const [detailCard, setDetailCard] = useState<CardInstance | null>(null);
   const [showLog, setShowLog] = useState(false);
+  const [showBoardPreview, setShowBoardPreview] = useState(false);
 
   const player = gameState.players.player;
   const ai = gameState.players.ai;
@@ -231,13 +237,12 @@ export function GameBoard() {
               </div>
               <div className="flex flex-wrap gap-2 justify-center">
                 {allPlayerCards.map((card) => (
-                  <div
+                  <CardComponent
                     key={card.instanceId}
+                    card={card}
+                    size="md"
                     onClick={() => resolveCardTarget(card.instanceId)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <CardComponent card={card} size="md" />
-                  </div>
+                  />
                 ))}
               </div>
             </div>
@@ -246,8 +251,34 @@ export function GameBoard() {
       })()}
 
       {/* ── Game over ── */}
-      {gameState.phase === 'game_over' && (
-        <GameOverModal winner={gameState.winner} onPlayAgain={resetGame} />
+      {gameState.phase === 'game_over' && !showBoardPreview && (
+        <GameOverModal
+          winner={gameState.winner}
+          locations={gameState.locations}
+          onPlayAgain={handlePlayAgain}
+          onViewBoard={() => setShowBoardPreview(true)}
+        />
+      )}
+      {gameState.phase === 'game_over' && showBoardPreview && (
+        <div
+          className="fixed bottom-0 inset-x-0 z-50 flex gap-3 px-4 py-3"
+          style={{ background: 'rgba(15,15,26,0.96)', borderTop: '1px solid var(--border)' }}
+        >
+          <button
+            onClick={() => setShowBoardPreview(false)}
+            className="flex-1 py-2 rounded-lg font-bold text-sm transition-all hover:scale-105"
+            style={{ background: 'rgba(255,255,255,0.07)', color: '#d1d5db', border: '1px solid rgba(255,255,255,0.12)' }}
+          >
+            ← Summary
+          </button>
+          <button
+            onClick={handlePlayAgain}
+            className="flex-1 py-2 rounded-lg font-bold text-sm transition-all hover:scale-105"
+            style={{ background: '#2563eb', color: 'white' }}
+          >
+            New Game
+          </button>
+        </div>
       )}
     </div>
   );
