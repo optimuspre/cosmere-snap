@@ -55,7 +55,7 @@ registerAbility('marsh_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
   const enemies = loc.cards[enemyId].filter((c) => !c.isDestroyed);
   if (enemies.length === 0) return [];
   const highest = enemies.reduce((max, c) => (c.currentPower > max.currentPower ? c : max));
-  return [{ type: 'modify_power', targetInstanceId: highest.instanceId, amount: -3, isPermanent: false }];
+  return [{ type: 'modify_power', targetInstanceId: highest.instanceId, amount: -3, isPermanent: true }];
 });
 
 registerAbility('spook_ongoing', (ctx: AbilityContext): GameStatePatch[] => {
@@ -121,7 +121,7 @@ registerAbility('marasi_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
   if (enemies.length === 0) return [];
   // Reduce the weakest enemy by 2
   const weakest = enemies.reduce((min, c) => (c.currentPower < min.currentPower ? c : min));
-  return [{ type: 'modify_power', targetInstanceId: weakest.instanceId, amount: -2, isPermanent: false }];
+  return [{ type: 'modify_power', targetInstanceId: weakest.instanceId, amount: -2, isPermanent: true }];
 });
 
 registerAbility('breeze_ongoing', (ctx: AbilityContext): GameStatePatch[] => {
@@ -140,7 +140,7 @@ registerAbility('ham_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
     ...loc.cards['ai'].filter((c) => !c.isDestroyed),
   ];
   if (allOthers.length === 0) return [];
-  return [{ type: 'modify_power', targetInstanceId: ctx.triggeringCard.instanceId, amount: allOthers.length, isPermanent: false }];
+  return [{ type: 'modify_power', targetInstanceId: ctx.triggeringCard.instanceId, amount: allOthers.length, isPermanent: true }];
 });
 
 registerAbility('steris_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {

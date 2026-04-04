@@ -19,7 +19,7 @@ registerAbility('kaladin_on_reveal', (ctx: AbilityContext): GameStatePatch[] => 
       type: 'modify_power' as const,
       targetInstanceId: c.instanceId,
       amount: 1,
-      isPermanent: false,
+      isPermanent: true,
     }));
 });
 
@@ -39,7 +39,7 @@ registerAbility('dalinar_on_reveal', (ctx: AbilityContext): GameStatePatch[] => 
     const loc = ctx.gameState.locations[i];
     for (const card of loc.cards[ctx.triggeringCard.ownerId]) {
       if (!card.isDestroyed) {
-        patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: 1, isPermanent: false });
+        patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: 1, isPermanent: true });
       }
     }
   }
@@ -91,7 +91,7 @@ registerAbility('moash_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
   const sacrifice = allies[Math.floor(Math.random() * allies.length)];
   return [
     { type: 'destroy_card', targetInstanceId: sacrifice.instanceId },
-    { type: 'modify_power', targetInstanceId: ctx.triggeringCard.instanceId, amount: sacrifice.currentPower, isPermanent: false },
+    { type: 'modify_power', targetInstanceId: ctx.triggeringCard.instanceId, amount: sacrifice.currentPower, isPermanent: true },
   ];
 });
 
@@ -122,7 +122,7 @@ registerAbility('eshonai_on_reveal', (ctx: AbilityContext): GameStatePatch[] => 
   const myPower = loc.powerTotals[ctx.triggeringCard.ownerId];
   const enemyPower = loc.powerTotals[enemyId];
   if (enemyPower > myPower) {
-    return [{ type: 'modify_power', targetInstanceId: ctx.triggeringCard.instanceId, amount: 4, isPermanent: false }];
+    return [{ type: 'modify_power', targetInstanceId: ctx.triggeringCard.instanceId, amount: 4, isPermanent: true }];
   }
   return [];
 });
@@ -136,7 +136,7 @@ registerAbility('bridge_four_soldier_on_reveal', (ctx: AbilityContext): GameStat
     }
   }
   if (count >= 3) {
-    return [{ type: 'modify_power', targetInstanceId: ctx.triggeringCard.instanceId, amount: 2, isPermanent: false }];
+    return [{ type: 'modify_power', targetInstanceId: ctx.triggeringCard.instanceId, amount: 2, isPermanent: true }];
   }
   return [];
 });

@@ -8,10 +8,10 @@ registerAbility('raoden_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
   for (const card of loc.cards[ctx.triggeringCard.ownerId]) {
     if (!card.isDestroyed) {
       // Remove all negative modifiers (restore to permanent base)
-      const negatives = card.powerModifiers.filter((m: PowerModifier) => !m.isPermanent && m.amount < 0);
+      const negatives = card.powerModifiers.filter((m: PowerModifier) => m.isPermanent && m.amount < 0);
       const totalRestore = negatives.reduce((sum: number, m: PowerModifier) => sum + Math.abs(m.amount), 0);
       if (totalRestore > 0) {
-        patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: totalRestore, isPermanent: false });
+        patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: totalRestore, isPermanent: true });
       }
       // Remove negative status effects
       patches.push({ type: 'remove_status', targetInstanceId: card.instanceId, effectType: 'trapped' });
@@ -39,7 +39,7 @@ registerAbility('galladon_on_reveal', (ctx: AbilityContext): GameStatePatch[] =>
     (c) => c.definitionId === 'raoden' && !c.isDestroyed
   );
   if (!hasRaoden) return [];
-  return [{ type: 'modify_power', targetInstanceId: ctx.triggeringCard.instanceId, amount: 2, isPermanent: false }];
+  return [{ type: 'modify_power', targetInstanceId: ctx.triggeringCard.instanceId, amount: 2, isPermanent: true }];
 });
 registerAbility('hrathen_ongoing', (ctx: AbilityContext): GameStatePatch[] => {
   const enemyId = ctx.triggeringCard.ownerId === 'player' ? 'ai' : 'player';

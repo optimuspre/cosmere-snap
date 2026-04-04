@@ -29,7 +29,7 @@ registerAbility('nightwatcher_on_reveal', (ctx: AbilityContext): GameStatePatch[
   const targetLoc = pickRandom(locs);
   for (const card of ctx.gameState.locations[targetLoc].cards[enemyId]) {
     if (!card.isDestroyed) {
-      patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: 4, isPermanent: false });
+      patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: 4, isPermanent: true });
     }
   }
 
@@ -51,12 +51,12 @@ registerAbility('odium_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
 
   for (const card of loc.cards[ctx.triggeringCard.ownerId]) {
     if (!card.isDestroyed && card.instanceId !== ctx.triggeringCard.instanceId) {
-      patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: 2, isPermanent: false });
+      patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: 2, isPermanent: true });
     }
   }
   for (const card of loc.cards[enemyId]) {
     if (!card.isDestroyed) {
-      patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: -1, isPermanent: false });
+      patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: -1, isPermanent: true });
     }
   }
 

@@ -22,7 +22,7 @@ registerAbility('lightsong_on_reveal', (ctx: AbilityContext): GameStatePatch[] =
   // Lose 2 power on all friendly cards here
   for (const card of loc.cards[ctx.triggeringCard.ownerId]) {
     if (!card.isDestroyed) {
-      patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: -2, isPermanent: false });
+      patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: -2, isPermanent: true });
     }
   }
 
@@ -42,7 +42,7 @@ registerAbility('lightsong_on_reveal', (ctx: AbilityContext): GameStatePatch[] =
 
   for (const card of ctx.gameState.locations[targetLoc].cards[ownerId]) {
     if (!card.isDestroyed) {
-      patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: 5, isPermanent: false });
+      patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: 5, isPermanent: true });
     }
   }
 
@@ -55,7 +55,7 @@ registerAbility('vivenna_on_reveal', (ctx: AbilityContext): GameStatePatch[] => 
   const enemies = loc.cards[enemyId].filter((c) => !c.isDestroyed);
   if (enemies.length === 0) return [];
   const target = pickRandom(enemies);
-  return [{ type: 'modify_power', targetInstanceId: target.instanceId, amount: -3, isPermanent: false }];
+  return [{ type: 'modify_power', targetInstanceId: target.instanceId, amount: -3, isPermanent: true }];
 });
 
 registerAbility('nightblood_end_of_turn', (ctx: AbilityContext): GameStatePatch[] => {
@@ -87,7 +87,7 @@ registerAbility('siri_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
       if (!card.isDestroyed && card.instanceId !== ctx.triggeringCard.instanceId) {
         const def = CARD_REGISTRY.get(card.definitionId);
         if (def?.world === 'nalthis') {
-          patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: 1, isPermanent: false });
+          patches.push({ type: 'modify_power', targetInstanceId: card.instanceId, amount: 1, isPermanent: true });
         }
       }
     }
