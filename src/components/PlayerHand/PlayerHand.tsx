@@ -1,5 +1,6 @@
 import type { CardInstance } from '../../types';
 import { CardComponent } from '../Card/CardComponent';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 interface Props {
   cards: CardInstance[];
@@ -22,6 +23,8 @@ export function PlayerHand({
   onCardTap,
   onCardDetailClick,
 }: Props) {
+  const isMobile = useIsMobile();
+
   return (
     <div className="flex gap-1.5 items-end justify-center flex-wrap">
       {cards.map((card) => {
@@ -38,6 +41,7 @@ export function PlayerHand({
           >
             <CardComponent
               card={card}
+              size={isMobile ? 'xs' : 'md'}
               isPending={isPending}
               isSelected={isSelected}
               onDragStart={() => onDragStart(card.instanceId)}

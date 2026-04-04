@@ -9,12 +9,14 @@ import { GameOverModal } from '../GameOver/GameOverModal';
 import { CardDetailModal } from '../Card/CardDetailModal';
 import { CardComponent } from '../Card/CardComponent';
 import { CardBack } from '../Card/CardBack';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import type { CardInstance } from '../../types';
 
 export function GameBoard() {
   useAITurn();
 
   const { gameState, playCard, removePlay, endPlayerTurn, resetGame, resolveCardTarget } = useGameStore();
+  const isMobile = useIsMobile();
 
   const [draggingCardId, setDraggingCardId] = useState<string | null>(null);
   const [hoveredLocationIndex, setHoveredLocationIndex] = useState<number | null>(null);
@@ -68,7 +70,7 @@ export function GameBoard() {
   return (
     <div
       className="flex flex-col"
-      style={{ height: '100dvh', background: 'var(--bg)', padding: '6px', gap: 4, overflow: 'hidden' }}
+      style={{ height: '100dvh', background: 'var(--bg)', padding: isMobile ? '4px' : '6px', gap: isMobile ? 2 : 4, overflow: 'hidden' }}
     >
       {/* ── Header bar ── */}
       <div className="flex items-center justify-between px-1 flex-shrink-0">
@@ -89,12 +91,18 @@ export function GameBoard() {
         {/* AI hand count */}
         <div className="flex items-center gap-1">
           <span className="text-xs text-gray-600">AI:</span>
-          <div className="flex gap-0.5">
-            {Array.from({ length: Math.min(aiHandCount, 7) }).map((_, i) => (
-              <CardBack key={i} size="sm" />
-            ))}
-          </div>
-          <span className="text-xs text-gray-600 ml-0.5">{aiHandCount}</span>
+          {isMobile ? (
+            <span className="text-xs font-bold text-gray-400">{aiHandCount}</span>
+          ) : (
+            <>
+              <div className="flex gap-0.5">
+                {Array.from({ length: Math.min(aiHandCount, 7) }).map((_, i) => (
+                  <CardBack key={i} size="sm" />
+                ))}
+              </div>
+              <span className="text-xs text-gray-600 ml-0.5">{aiHandCount}</span>
+            </>
+          )}
         </div>
 
         {/* Log toggle */}
@@ -134,7 +142,7 @@ export function GameBoard() {
       {/* ── Player controls ── */}
       <div
         className="flex-shrink-0"
-        style={{ background: 'rgba(0,0,0,0.25)', borderRadius: 10, padding: '6px 6px 8px', border: '1px solid var(--border)' }}
+        style={{ background: 'rgba(0,0,0,0.25)', borderRadius: 10, padding: isMobile ? '4px 4px 6px' : '6px 6px 8px', border: '1px solid var(--border)' }}
       >
         <div className="flex items-center justify-between mb-2 px-1">
           <EnergyBar current={player.currentEnergy} max={player.maxEnergy} />

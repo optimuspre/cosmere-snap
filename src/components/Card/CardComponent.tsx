@@ -11,7 +11,7 @@ interface Props {
   onDetailClick?: () => void;
   onDragStart?: () => void;
   onDragEnd?: () => void;
-  size?: 'sm' | 'md';
+  size?: 'xxs' | 'xs' | 'sm' | 'md';
 }
 
 export function CardComponent({
@@ -27,6 +27,8 @@ export function CardComponent({
   const def = CARD_REGISTRY.get(card.definitionId);
   if (!def) return null;
 
+  const isXxs = size === 'xxs';
+  const isXs = size === 'xs';
   const isSmall = size === 'sm';
   const [isHovered, setIsHovered] = useState(false);
 
@@ -56,9 +58,9 @@ export function CardComponent({
       data-world={def.world}
       className={`card select-none relative ${isPending ? 'pending' : ''} ${isSelected ? 'ring-2 ring-blue-400 selected' : ''}`}
       style={{
-        width: isSmall ? 136 : 192,
-        height: isSmall ? 180 : 252,
-        padding: isSmall ? '8px' : '10px',
+        width: isXxs ? 52 : isXs ? 88 : isSmall ? 136 : 192,
+        height: isXxs ? 70 : isXs ? 116 : isSmall ? 180 : 252,
+        padding: isXxs ? '4px' : isXs ? '6px' : isSmall ? '8px' : '10px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -82,8 +84,8 @@ export function CardComponent({
         <span
           className="font-bold text-white rounded-full flex items-center justify-center"
           style={{
-            width: isSmall ? 22 : 28, height: isSmall ? 22 : 28,
-            fontSize: isSmall ? '0.75rem' : '0.9rem',
+            width: isXxs ? 14 : isXs ? 18 : isSmall ? 22 : 28, height: isXxs ? 14 : isXs ? 18 : isSmall ? 22 : 28,
+            fontSize: isXxs ? '0.55rem' : isXs ? '0.65rem' : isSmall ? '0.75rem' : '0.9rem',
             background: 'rgba(0,0,0,0.5)',
             border: '1px solid var(--world-accent)',
             flexShrink: 0,
@@ -91,7 +93,7 @@ export function CardComponent({
         >
           {def.cost}
         </span>
-        <WorldBadge world={def.world} />
+        {!isXs && !isXxs && <WorldBadge world={def.world} />}
       </div>
 
       {/* Name */}
@@ -101,14 +103,14 @@ export function CardComponent({
       >
         <div
           className="font-bold leading-tight text-center"
-          style={{ color: 'var(--world-accent)', fontSize: isSmall ? '0.75rem' : '0.95rem' }}
+          style={{ color: 'var(--world-accent)', fontSize: isXxs ? '0.5rem' : isXs ? '0.62rem' : isSmall ? '0.75rem' : '0.95rem' }}
         >
           {def.name}
         </div>
       </div>
 
-      {/* Flavor text */}
-      {def.flavorText && (
+      {/* Flavor text — hidden on xs/xxs */}
+      {def.flavorText && !isXs && !isXxs && (
         <div
           className="italic text-center leading-tight"
           style={{
@@ -129,7 +131,7 @@ export function CardComponent({
           className="font-bold rounded text-white px-1"
           style={{
             background: 'rgba(0,0,0,0.5)',
-            fontSize: isSmall ? '1rem' : '1.25rem',
+            fontSize: isXxs ? '0.7rem' : isXs ? '0.82rem' : isSmall ? '1rem' : '1.25rem',
             border: '1px solid rgba(255,255,255,0.2)',
           }}
         >
@@ -146,7 +148,7 @@ export function CardComponent({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: isSmall ? '4px' : '6px',
+            padding: isXxs ? '2px' : isXs ? '3px' : isSmall ? '4px' : '6px',
             background: 'rgba(0,0,0,0.82)',
             borderRadius: 8,
             opacity: isHovered || isSelected ? 1 : 0,
@@ -156,7 +158,7 @@ export function CardComponent({
         >
           <div
             className="text-center leading-tight text-gray-100"
-            style={{ fontSize: isSmall ? '0.7rem' : '0.85rem' }}
+            style={{ fontSize: isXxs ? '0.48rem' : isXs ? '0.6rem' : isSmall ? '0.7rem' : '0.85rem' }}
           >
             {def.abilityText !== 'No ability.' ? def.abilityText : (
               <span className="italic text-gray-400">{def.flavorText}</span>

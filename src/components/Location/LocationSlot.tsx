@@ -2,6 +2,7 @@ import type { LocationState, CardInstance } from '../../types';
 import { LOCATION_REGISTRY } from '../../data/locations';
 import { CardComponent } from '../Card/CardComponent';
 import { CardBack } from '../Card/CardBack';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 interface Props {
   locationState: LocationState;
@@ -26,6 +27,7 @@ export function LocationSlot({
   onTap,
   onBoardCardClick,
 }: Props) {
+  const isMobile = useIsMobile();
   const locDef = LOCATION_REGISTRY.get(locationState.definitionId);
 
   const winnerClass =
@@ -49,12 +51,12 @@ export function LocationSlot({
       {/* Location header */}
       <div
         className="text-center px-1 py-1 border-b"
-        style={{ borderColor: 'var(--border)', minHeight: 56 }}
+        style={{ borderColor: 'var(--border)', minHeight: isMobile ? 52 : 56 }}
       >
         {locationState.isRevealed && locDef ? (
           <>
-            <div className="font-bold text-xs text-white leading-tight">{locDef.name}</div>
-            <div className="text-gray-400 mt-0.5 leading-tight" style={{ fontSize: '0.58rem' }}>{locDef.effectText}</div>
+            <div className="font-bold text-white leading-tight" style={{ fontSize: isMobile ? '0.6rem' : '0.75rem' }}>{locDef.name}</div>
+            <div className="text-gray-400 mt-0.5 leading-tight" style={{ fontSize: isMobile ? '0.5rem' : '0.58rem' }}>{locDef.effectText}</div>
           </>
         ) : (
           <div className="text-gray-600 text-xs mt-2">?</div>
@@ -69,13 +71,13 @@ export function LocationSlot({
       </div>
 
       {/* AI cards (top) */}
-      <div className="flex flex-wrap gap-0.5 justify-center p-1" style={{ minHeight: 48 }}>
+      <div className="flex flex-wrap gap-0.5 justify-center p-1" style={{ minHeight: isMobile ? 20 : 48 }}>
         {locationState.cards.ai.map((card) =>
           card.isRevealed ? (
             <CardComponent
               key={card.instanceId}
               card={card}
-              size="sm"
+              size={isMobile ? 'xxs' : 'sm'}
               onClick={() => onBoardCardClick(card)}
             />
           ) : (
@@ -90,14 +92,14 @@ export function LocationSlot({
       {/* Player cards (bottom) */}
       <div
         className="flex flex-wrap gap-0.5 justify-center p-1"
-        style={{ minHeight: 48, flex: 1 }}
+        style={{ minHeight: isMobile ? 20 : 48, flex: 1, alignContent: 'flex-start' }}
         onDrop={() => onDrop(locationIndex)}
       >
         {locationState.cards.player.map((card) => (
           <CardComponent
             key={card.instanceId}
             card={card}
-            size="sm"
+            size={isMobile ? 'xxs' : 'sm'}
             onClick={() => onBoardCardClick(card)}
           />
         ))}
