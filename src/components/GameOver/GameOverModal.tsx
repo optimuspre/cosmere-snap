@@ -1,4 +1,5 @@
 import { LOCATION_REGISTRY } from '../../data/locations';
+import { useHistoryStore } from '../../store/historyStore';
 import type { LocationState } from '../../types/location.types';
 import type { PlayerId } from '../../types';
 
@@ -10,6 +11,11 @@ interface Props {
 }
 
 export function GameOverModal({ winner, locations, onPlayAgain, onViewBoard }: Props) {
+  const results = useHistoryStore((s) => s.results);
+  const wins   = results.filter((r) => r.result === 'win').length;
+  const losses = results.filter((r) => r.result === 'loss').length;
+  const ties   = results.filter((r) => r.result === 'tie').length;
+
   const title =
     winner === 'player' ? 'Victory!' : winner === 'ai' ? 'Defeated' : 'Draw';
   const subtitle =
@@ -48,6 +54,16 @@ export function GameOverModal({ winner, locations, onPlayAgain, onViewBoard }: P
             {title}
           </div>
           <div className="text-gray-400 text-sm">{subtitle}</div>
+          {results.length > 0 && (
+            <div className="text-xs mt-2" style={{ color: '#6b7280' }}>
+              Record:{' '}
+              <span style={{ color: '#60a5fa', fontWeight: 600 }}>{wins}W</span>
+              {' · '}
+              <span style={{ color: '#ef4444', fontWeight: 600 }}>{losses}L</span>
+              {' · '}
+              <span style={{ color: '#9ca3af', fontWeight: 600 }}>{ties}T</span>
+            </div>
+          )}
         </div>
 
         {/* Location breakdown */}

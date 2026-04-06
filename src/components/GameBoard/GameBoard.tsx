@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useGameStore } from '../../store/gameStore';
+import { useHistoryStore } from '../../store/historyStore';
 import { useAITurn } from '../../hooks/useAITurn';
 import { useNarratorQueue } from '../../hooks/useNarratorQueue';
 import { LocationSlot } from '../Location/LocationSlot';
@@ -17,8 +18,24 @@ import type { CardInstance } from '../../types';
 export function GameBoard() {
   useAITurn();
   const { currentEvent } = useNarratorQueue();
-
+  const { addResult } = useHistoryStore();
   const { gameState, playCard, removePlay, endPlayerTurn, resetGame, resolveCardTarget } = useGameStore();
+  const selectedWorlds = useGameStore((s) => s.selectedWorlds);
+
+  const hasRecordedRef = useRef(false);
+  useEffect(() => {
+    if (gameState.phase === 'player_action') hasRecordedRef.current = false;
+  }, [gameState.phase]);
+  useEffect(() => {
+    if (gameState.phase !== 'game_over' || gameState.winner === null) return;
+    if (hasRecordedRef.current) return;
+    hasRecordedRef.current = true;
+    addResult({
+      result: gameState.winner === 'player' ? 'win' : gameState.winner === 'ai' ? 'loss' : 'tie',
+      worlds: selectedWorlds,
+      turn: gameState.turn,
+    });
+  }, [gameState.phase, gameState.winner]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handlePlayAgain() {
     setShowBoardPreview(false);

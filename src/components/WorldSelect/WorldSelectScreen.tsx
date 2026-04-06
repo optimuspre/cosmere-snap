@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { World } from '../../types/card.types';
 import { ALL_CARDS } from '../../data/cards';
 import { useGameStore } from '../../store/gameStore';
+import { useHistoryStore } from '../../store/historyStore';
 import { DECK_SIZE } from '../../data/constants';
 
 interface WorldMeta {
@@ -25,9 +26,30 @@ const cardCountByWorld = new Map<World, number>(
 
 const ALL_WORLD_KEYS: World[] = WORLDS.map((w) => w.key);
 
+const WORLD_LABELS: Record<World, string> = {
+  'roshar': 'Roshar',
+  'scadrial-era1': 'Scadrial I',
+  'scadrial-era2': 'Scadrial II',
+  'nalthis': 'Nalthis',
+  'sel': 'Sel',
+  'cosmere-wide': 'Cosmere',
+};
+
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  if (d.toDateString() === today.toDateString()) return 'Today';
+  if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
 export function WorldSelectScreen() {
   const startGame = useGameStore((s) => s.startGame);
+  const { results, clearHistory } = useHistoryStore();
   const [selected, setSelected] = useState<Set<World>>(new Set(ALL_WORLD_KEYS));
+  const [showHistory, setShowHistory] = useState(false);
 
   const poolSize = ALL_WORLD_KEYS
     .filter((w) => selected.has(w))
@@ -130,6 +152,68 @@ export function WorldSelectScreen() {
           Clear
         </button>
       </div>
+
+      {/* Win/Loss History */}
+      {results.length > 0 && (
+        <div className="w-full mb-6" style={{ maxWidth: 520 }}>
+          {/* Stats row + toggle */}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex gap-4 text-sm font-semibold">
+              <span style={{ color: '#60a5fa' }}>{results.filter(r => r.result === 'win').length}W</span>
+              <span style={{ color: '#ef4444' }}>{results.filter(r => r.result === 'loss').length}L</span>
+              <span style={{ color: '#9ca3af' }}>{results.filter(r => r.result === 'tie').length}T</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowHistory((v) => !v)}
+                className="text-xs font-medium"
+                style={{ color: '#6b7280' }}
+              >
+                History {showHistory ? '▴' : '▾'}
+              </button>
+              <button
+                onClick={clearHistory}
+                className="text-xs"
+                style={{ color: '#4b5563' }}
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+
+          {/* Expandable history list */}
+          {showHistory && (
+            <div
+              className="rounded-xl overflow-hidden"
+              style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}
+            >
+              {results.slice(0, 10).map((r) => (
+                <div
+                  key={r.id}
+                  className="flex items-center justify-between px-3 py-2 text-xs"
+                  style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+                >
+                  <span
+                    className="font-bold px-2 py-0.5 rounded-full"
+                    style={{
+                      background: r.result === 'win' ? 'rgba(96,165,250,0.15)' : r.result === 'loss' ? 'rgba(239,68,68,0.15)' : 'rgba(156,163,175,0.15)',
+                      color: r.result === 'win' ? '#60a5fa' : r.result === 'loss' ? '#ef4444' : '#9ca3af',
+                      minWidth: 36,
+                      textAlign: 'center',
+                    }}
+                  >
+                    {r.result === 'win' ? 'Win' : r.result === 'loss' ? 'Loss' : 'Tie'}
+                  </span>
+                  <span className="text-gray-500 flex-1 mx-3 truncate">
+                    {r.worlds.map((w) => WORLD_LABELS[w]).join(', ')}
+                  </span>
+                  <span style={{ color: '#4b5563' }}>{formatDate(r.date)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Start button */}
       <button
