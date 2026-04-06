@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useGameStore } from '../../store/gameStore';
 import { useAITurn } from '../../hooks/useAITurn';
+import { useNarratorQueue } from '../../hooks/useNarratorQueue';
 import { LocationSlot } from '../Location/LocationSlot';
 import { PlayerHand } from '../PlayerHand/PlayerHand';
 import { EnergyBar } from '../EnergyBar/EnergyBar';
@@ -9,11 +10,13 @@ import { GameOverModal } from '../GameOver/GameOverModal';
 import { CardDetailModal } from '../Card/CardDetailModal';
 import { CardComponent } from '../Card/CardComponent';
 import { CardBack } from '../Card/CardBack';
+import { TurnNarrator } from '../TurnNarrator/TurnNarrator';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import type { CardInstance } from '../../types';
 
 export function GameBoard() {
   useAITurn();
+  const { currentEvent } = useNarratorQueue();
 
   const { gameState, playCard, removePlay, endPlayerTurn, resetGame, resolveCardTarget } = useGameStore();
 
@@ -280,6 +283,8 @@ export function GameBoard() {
           </button>
         </div>
       )}
+
+      <TurnNarrator currentEvent={currentEvent} phase={gameState.phase} />
     </div>
   );
 }
