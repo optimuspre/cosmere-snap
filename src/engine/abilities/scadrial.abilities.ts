@@ -19,23 +19,15 @@ registerAbility('kelsier_on_reveal', (ctx: AbilityContext): GameStatePatch[] => 
   return [{ type: 'set_immune', targetInstanceId: ctx.triggeringCard.instanceId }];
 });
 
-registerAbility('sazed_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
-  const patches: GameStatePatch[] = [
-    { type: 'draw_card', playerId: ctx.triggeringCard.ownerId, count: 2 },
-  ];
-  // Ongoing power_lock is handled by sazed_ongoing
-  return patches;
-});
-
-registerAbility('sazed_ongoing', (ctx: AbilityContext): GameStatePatch[] => {
-  // No patches needed — power_locked status is applied on reveal separately
-  // The patchApplier respects power_locked when applying negative modify_power
+registerAbility('lord_ruler_on_reveal', (ctx: AbilityContext): GameStatePatch[] => {
   const loc = ctx.gameState.locations[ctx.locationIndex];
   const patches: GameStatePatch[] = [];
-  for (const card of loc.cards[ctx.triggeringCard.ownerId]) {
-    if (!card.isDestroyed && !card.statusEffects.some((s) => s.type === 'power_locked')) {
-      patches.push({ type: 'set_status', targetInstanceId: card.instanceId, effect: { type: 'power_locked' } });
-    }
+  const allCards = [
+    ...loc.cards.player,
+    ...loc.cards.ai,
+  ].filter((c) => !c.isDestroyed && !c.isImmune && c.instanceId !== ctx.triggeringCard.instanceId && c.currentPower <= 3);
+  for (const card of allCards) {
+    patches.push({ type: 'destroy_card', targetInstanceId: card.instanceId });
   }
   return patches;
 });
